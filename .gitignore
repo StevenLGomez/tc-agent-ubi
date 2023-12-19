@@ -1,0 +1,7 @@
+
+# Ignore TeamCity project files
+# Ignore SlickEdit background files
+*.vtg
+*.vpwhist*
+*.vpwwild*
+
