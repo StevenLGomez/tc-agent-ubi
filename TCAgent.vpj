@@ -1,0 +1,126 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="Python - Empty Project"
+    WorkingDir=".">
+    <Files>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{30534F78-BBB6-468B-BF55-41D9A68153E6}">
+            <F N=".gitignore"/>
+            <F N="README.md"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.py"
+            GUID="{0909967E-BD4F-4742-8213-620274F220F9}">
+            <F N="Containerfile"/>
+            <F N="start-agent-1.sh"/>
+            <F N="start-agent-2.sh"/>
+            <F N="start-agent-3.sh"/>
+            <F N="start-agent-A.sh"/>
+            <F N="start-agent-B.sh"/>
+            <F N="start-agent-C.sh"/>
+        </Folder>
+        <Folder
+            Name="agent-1-config"
+            Filters="*.properties"
+            GUID="{8662D984-0D6D-41B1-B34F-E6E6D6626F91}">
+            <F N="agent-1-config/buildAgent.properties"/>
+        </Folder>
+        <Folder
+            Name="agent-2-config"
+            Filters=""
+            GUID="{6A6437C1-E9A2-4115-A409-0A62363A7013}">
+            <F N="agent-2-config/buildAgent.properties"/>
+        </Folder>
+        <Folder
+            Name="agent-3-config"
+            Filters=""
+            GUID="{2EF8326A-FDC9-43D9-B734-7174EDB5DF7A}">
+            <F N="agent-3-config/buildAgent.properties"/>
+        </Folder>
+        <Folder
+            Name="agent-A-config"
+            Filters=""
+            GUID="{1A24C82C-63C3-44D7-9924-BF4BCF941B98}">
+            <F N="agent-A-config/buildAgent.properties"/>
+        </Folder>
+        <Folder
+            Name="agent-B-config"
+            Filters=""
+            GUID="{E9627CD2-646E-4E1B-940B-8421DA741BD7}">
+            <F N="agent-B-config/buildAgent.properties"/>
+        </Folder>
+        <Folder
+            Name="agent-C-config"
+            Filters=""
+            GUID="{E874124E-1E5B-411F-B6FB-7F37807AE14C}">
+            <F N="agent-C-config/buildAgent.properties"/>
+        </Folder>
+    </Files>
+    <Config
+        Name="Debug"
+        DebugCallbackName="dap"
+        Type="python"
+        OutputFile=""
+        AppType="python"
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                Dialog="_python_options_form Run"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw"
+                Deletable="0">
+                <Exec CmdLine='"%(SLICKEDIT_PYTHON_EXE)" %(SLICKEDIT_PYTHON_EXECUTE_ARGS) "%f" %~other'/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                Dialog="_python_options_form Debug"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveNone"
+                RunFromDir="%rw"
+                Deletable="0">
+                <Exec
+                    CmdLine="python_debug"
+                    Type="Slick-C"/>
+            </Target>
+            <Target
+                Name="Python Options"
+                MenuCaption="Python &amp;Options"
+                ShowOnMenu="HideIfNoCmdLine"
+                Deletable="0">
+                <Exec
+                    CmdLine="pythonoptions"
+                    Type="Slick-C"/>
+            </Target>
+        </Menu>
+        <List Name="Python Options">
+            <Item
+                Name="DefaultFile"
+                Value=""/>
+        </List>
+        <List Name="pydbgp Options">
+            <Item
+                Name="ServerHost"
+                Value="127.0.0.1"/>
+            <Item
+                Name="ServerPort"
+                Value="0"/>
+            <Item
+                Name="ListenInBackground"
+                Value="1"/>
+            <Item
+                Name="show_hidden"
+                Value="0"/>
+        </List>
+    </Config>
+    <List Name="RTE">
+    </List>
+</Project>
