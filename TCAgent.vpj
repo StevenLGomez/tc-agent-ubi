@@ -14,51 +14,64 @@
         </Folder>
         <Folder
             Name="Source Files"
-            Filters="*.py"
+            Filters="*.sh"
             GUID="{0909967E-BD4F-4742-8213-620274F220F9}">
             <F N="Containerfile"/>
-            <F N="start-agent-1.sh"/>
-            <F N="start-agent-2.sh"/>
-            <F N="start-agent-3.sh"/>
-            <F N="start-agent-A.sh"/>
-            <F N="start-agent-B.sh"/>
-            <F N="start-agent-C.sh"/>
+            <F N="start.sh"/>
         </Folder>
         <Folder
-            Name="agent-1-config"
+            Name="config-01"
             Filters="*.properties"
             GUID="{8662D984-0D6D-41B1-B34F-E6E6D6626F91}">
-            <F N="agent-1-config/buildAgent.properties"/>
+            <F N="config-01/buildAgent.properties"/>
         </Folder>
         <Folder
-            Name="agent-2-config"
+            Name="config-02"
             Filters=""
             GUID="{6A6437C1-E9A2-4115-A409-0A62363A7013}">
-            <F N="agent-2-config/buildAgent.properties"/>
+            <F N="config-02/buildAgent.properties"/>
         </Folder>
         <Folder
-            Name="agent-3-config"
+            Name="config-03"
             Filters=""
             GUID="{2EF8326A-FDC9-43D9-B734-7174EDB5DF7A}">
-            <F N="agent-3-config/buildAgent.properties"/>
+            <F N="config-03/buildAgent.properties"/>
         </Folder>
         <Folder
-            Name="agent-A-config"
+            Name="config-A"
             Filters=""
             GUID="{1A24C82C-63C3-44D7-9924-BF4BCF941B98}">
-            <F N="agent-A-config/buildAgent.properties"/>
+            <F N="config-A/buildAgent.properties"/>
         </Folder>
         <Folder
-            Name="agent-B-config"
+            Name="config-B"
             Filters=""
             GUID="{E9627CD2-646E-4E1B-940B-8421DA741BD7}">
-            <F N="agent-B-config/buildAgent.properties"/>
+            <F N="config-B/buildAgent.properties"/>
         </Folder>
         <Folder
-            Name="agent-C-config"
+            Name="config-C"
             Filters=""
             GUID="{E874124E-1E5B-411F-B6FB-7F37807AE14C}">
-            <F N="agent-C-config/buildAgent.properties"/>
+            <F N="config-C/buildAgent.properties"/>
+        </Folder>
+        <Folder
+            Name="config-X"
+            Filters=""
+            GUID="{BF457AD7-EA80-4F39-96C0-FFC0FAF38D28}">
+            <F N="config-X/buildAgent.properties"/>
+        </Folder>
+        <Folder
+            Name="config-Y"
+            Filters=""
+            GUID="{E5EAD231-F43D-40A4-8834-7CBBD9307F92}">
+            <F N="config-Y/buildAgent.properties"/>
+        </Folder>
+        <Folder
+            Name="config-Z"
+            Filters=""
+            GUID="{7147B8FC-F213-48E9-BBCE-81448C3C67D4}">
+            <F N="config-Z/buildAgent.properties"/>
         </Folder>
     </Files>
     <Config
