@@ -5,3 +5,6 @@
 *.vpwhist*
 *.vpwwild*
 
+# Ignore TeamCity agent blob
+**/TeamCity/*/
+
