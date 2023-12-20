@@ -39,11 +39,12 @@ echo 'Starting ' ${AGENT_NAME}
 
 # sudo podman run -d --name ${AGENT_NAME}                      \
 # podman run --rm -it --name ${AGENT_NAME}                     \
+podman run --detach --user tc_agent                             \
 
 #    --cap-add=sys_admin,mknod --device=/dev/fuse --security-opt label=disable \
 #    --privileged                                                \
 
-podman run --detach --user tc_agent                             \
+podman run --detach --user podman                             \
     --cap-add=sys_admin,mknod --device=/dev/fuse --security-opt label=disable \
     --name ${AGENT_NAME}                                        \
     --env AGENT_NAME=${AGENT_NAME}                              \
