@@ -1,7 +1,6 @@
 
 # Container in Container base example
 
-# FROM registry.access.redhat.com/ubi8/ubi
 FROM registry.access.redhat.com/ubi9/ubi
 
 # Update & install items required to run as a TeamCity Agent
@@ -85,19 +84,51 @@ RUN useradd podman; \
      echo podman:10000:5000 > /etc/subuid;  \
      echo podman:10000:5000 > /etc/subgid;
 
+# RootFULL container storage
+VOLUME /var/lib/containers
+
+# RootLESS container storage
+VOLUME /home/podman/.local/share/containers
+
 # Download latest stable configuration files
 ARG _REPO_URL="https://raw.githubusercontent.com/containers/podman/main/contrib/podmanimage/stable"
 ADD $_REPO_URL/containers.conf /etc/containers/containers.conf
 ADD $_REPO_URL/podman-containers.conf /home/podman/.config/containers/containers.conf
 
-# RUN mkdir -p /home/tc_agent/.config/containers/
-# ADD $_REPO_URL/podman-containers.conf /home/tc_agent/.config/containers/containers.conf
-# RUN chown -R tc_agent:tc_agent /home/tc_agent/.config/
+RUN chown podman:podman -R /home/podman
+#RUN sed -i -e 's|^#mount_program|mount_program|g' /etc/containers/storage.conf
+#RUN sed -i -e 's|^#mount_program|mount_program|g' -e '/additionalimage.*/a "/var/lib/shared",' /etc/containers/storage.conf
 
+# Change permissions for containers.conf
+RUN chmod 644 /etc/containers/containers.conf
 
+# Update settings in storage.conf
+RUN sed -i -e 's|^#mount_program|mount_program|g' \
+    -e '/additionalimage.*/a "/var/lib/shared",' \
+    -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
+    /etc/containers/storage.conf
 
+RUN mkdir --parents \
+    /var/lib/shared/overlay-images \
+    /var/lib/shared/overlay-layers \
+    /var/lib/shared/vfs-images     \
+    /var/lib/shared/vfs-layers     \
 
+#RUN \
+#    touch /var/lib/shared/overlay-images/images.lock; \
+#    touch /var/lib/shared/overlay-layers/layers.lock; \ 
+#    touch /var/lib/shared/vfs-images/images.lock;     \
+#    touch /var/lib/shared/vfs-layers/layers.lock
+
+# Add configuration files to tc_agent user
+#RUN mkdir -p /home/tc_agent/.config/containers/
+#ADD $_REPO_URL/podman-containers.conf /home/tc_agent/.config/containers/containers.conf
+#RUN chown -R tc_agent:tc_agent /home/tc_agent/.config/
+
+# NO, assign user externally -- Assign user that runs inside the container
+# USER tc_agent
+# USER podman
 
 # Entry command - starts TeamCity Agent
-CMD ["/run-agent.sh"]
+# CMD ["/run-agent.sh"]
 
