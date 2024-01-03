@@ -1,7 +1,7 @@
 
 # Podman Container in Container reference image
 
-From: https://github.com/containers/podman/tree/main/contrib/podmanimage/stable
+Reference [repository](https://github.com/containers/podman/tree/main/contrib/podmanimage/stable)
 
 5dc8074 Nov 13, 2023
 
@@ -16,7 +16,7 @@ podman build -t tc:f01 .
 ```
 
 --------
-Test rootless behavior using examples from Brian Smith, Red Hat Principal Technical Account Manater
+Test rootless behavior using examples from Brian Smith, Red Hat Principal Technical Account Manager   
 Reference [video](https://www.youtube.com/watch?v=ZgXpWKgQclc)
 --------
 
@@ -64,6 +64,31 @@ ps -ef | grep "sleep 1500" | grep -v grep        # Shows running as 100000 + (5 
 # Display task uid 
 ps -ef n | grep "sleep 1500" | grep -v grep      # Shows same uid as above 
 ```
+
+**Test (built in ) podman user -> NON-root inside**   
+```
+# Start container instance 
+podman run -d --name pm-rootless --user podman tc:f01 tail -f /dev/null
+
+# Enter container shell
+podman exec -it pm-rootless /bin/bash
+
+# In container shell
+whoami             # Shows podman 
+id                 # Shows uid=1000(podman) gid=1000(podman) groups=1000(podman)
+sleep 2000 &       # Start background process in container
+
+grep podman /etc/passwd     # In container, podman user is uid 1000
+
+exit               # Return to host
+
+# In host shell, confirm container task ownership
+ps -ef | grep "sleep 2000" | grep -v grep        # Shows running as 100999 (100000 + (1000 - 1))
+
+# Display task uid 
+ps -ef n | grep "sleep 2000" | grep -v grep      # Shows same uid as above 
+```
+
 
 
 
