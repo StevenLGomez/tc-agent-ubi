@@ -126,7 +126,7 @@ podman run -it --rm --user podman --name vtest --volume ./test-vol:/home/podman/
 podman run -it --rm --user podman --name vtest --volume ./test-vol:/home/podman/hostvol:Z tc:f01 /bin/bash
 
 # On host
-sudo useradd podman          # Running above, hoostvol still owned by root
+sudo useradd podman          # Running above, hostvol still owned by root
 
 podman run -it --rm --user podman --name vtest --device=/dev/fuse --volume ./test-vol:/home/podman/hostvol:Z tc:f01 /bin/bash
 
@@ -136,6 +136,9 @@ sudo chown -R 101000:101000 test-vol/
 sudo chown -R 100999:100999 test-vol/
 podman run -it --rm --user podman --name vtest --device=/dev/fuse --volume ./test-vol:/home/podman/hostvol:Z tc:f01 /bin/bash
 # The above seems to work, it was possible to change file in the test volume
+
+# And the following also allows writes inside the container (omitted --device=/dev/fuse)
+podman run -it --rm --user podman --name vtest --volume ./test-vol:/home/podman/hostvol:Z tc:f01 /bin/bash
 
 ```
 
