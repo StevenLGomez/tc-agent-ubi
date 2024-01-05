@@ -1,7 +1,7 @@
 
 # Podman Container in Container reference image
 
-Reference [repository](https://github.com/containers/podman/tree/main/contrib/podmanimage/stable)
+Reference github [repository](https://github.com/containers/podman/tree/main/contrib/podmanimage/stable)
 
 5dc8074 Nov 13, 2023
 
@@ -17,6 +17,7 @@ podman build -t tc:f01 .
 
 --------
 Test rootless behavior using examples from Brian Smith, Red Hat Principal Technical Account Manager   
+
 Reference [video](https://www.youtube.com/watch?v=ZgXpWKgQclc)
 --------
 
@@ -89,6 +90,54 @@ ps -ef | grep "sleep 2000" | grep -v grep        # Shows running as 100999 (1000
 ps -ef n | grep "sleep 2000" | grep -v grep      # Shows same uid as above 
 ```
 
+**Test local directory volume - full rootless**   
+```
+# Start container instance 
+podman system prune    # Remove previous container instances (that didn't have the volume attached)
+cd ~/tmp
+mkdir test-vol
+vi test-vol/hello.txt  # Add some simple text
+
+# In ~/tmp working directory
+podman run -d --name vtest --user podman --volume ./test-vol:/home/podman tc:f01 tail -f /dev/null
+
+podman exec -it vtest /bin/bash
+# /home/podman owned by root inside
+
+podman stop vtest
+podman system prune
+
+# Add --rm to allow restarting without removing previous container
+podman run -it --rm --name vtest --user podman --volume ./test-vol:/home/podman tc:f01 /bin/bash
+# /home/podman owned by root inside
+
+podman run -it --rm --name vtest --volume ./test-vol:/home/podman tc:f01 /bin/bash
+sleep 999 &
+
+# On host
+ps -ef | grep "sleep 999" | grep -v grep
+develop+    8088    8068  0 14:09 pts/0    00:00:00 sleep 999
+
+# Minor change, create hostvol inside container.
+podman run -it --rm --user podman --name vtest --volume ./test-vol:/home/podman/hostvol tc:f01 /bin/bash
+# /home/podman/hostvol can be entered, but it is owned by root inside the container.
+
+# Add the SELINUX :Z flag (allow container write permission, for THIS container only)
+podman run -it --rm --user podman --name vtest --volume ./test-vol:/home/podman/hostvol:Z tc:f01 /bin/bash
+
+# On host
+sudo useradd podman          # Running above, hoostvol still owned by root
+
+podman run -it --rm --user podman --name vtest --device=/dev/fuse --volume ./test-vol:/home/podman/hostvol:Z tc:f01 /bin/bash
+
+sudo chown -R 101000:101000 test-vol/
+# hostvol owned by 1001:1001
+
+sudo chown -R 100999:100999 test-vol/
+podman run -it --rm --user podman --name vtest --device=/dev/fuse --volume ./test-vol:/home/podman/hostvol:Z tc:f01 /bin/bash
+# The above seems to work, it was possible to change file in the test volume
+
+```
 
 
 
