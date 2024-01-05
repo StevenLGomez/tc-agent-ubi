@@ -1,7 +1,7 @@
 
 # AGENT_IMAGE=quay.io/el_guapo/tc-agent-ubi:001
 # AGENT_IMAGE=piaubi:001
-AGENT_IMAGE=pia:001
+AGENT_IMAGE=ubi:001
 
 function ShowUsageInformation
 {
@@ -39,16 +39,21 @@ echo 'Starting ' ${AGENT_NAME}
 
 # sudo podman run -d --name ${AGENT_NAME}                      \
 # podman run --rm -it --name ${AGENT_NAME}                     \
-podman run --detach --user tc_agent                             \
+# podman run --detach --user tc_agent                             \
 
 #    --cap-add=sys_admin,mknod --device=/dev/fuse --security-opt label=disable \
 #    --privileged                                                \
+#    --detatch                                                   \
 
-podman run --detach --user podman                             \
+podman run                                                      \
+    --rm -it                                                    \
+    --user tc_agent                                             \
     --cap-add=sys_admin,mknod --device=/dev/fuse --security-opt label=disable \
     --name ${AGENT_NAME}                                        \
     --env AGENT_NAME=${AGENT_NAME}                              \
     --env SERVER_URL=http://usstlbas01:8111                     \
     --volume ./config-${AGENT_ID}:/data/teamcity_agent/conf:Z   \
-    ${AGENT_IMAGE}
+    ${AGENT_IMAGE} /bin/bash
+
+
 
