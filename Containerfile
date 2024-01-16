@@ -58,7 +58,9 @@ VOLUME /opt/buildagent/tools
 VOLUME /opt/buildagent/plugins
 VOLUME /data/teamcity_agent/conf
 
-#
+# Duplicated from above, the above didn't seem to 'take'
+RUN chown -R developer:developer /data/teamcity_agent 
+
 ENV JAVA_HOME=/usr
 ENV LANG=C.UTF-8
 
@@ -74,14 +76,17 @@ ENV LANG=C.UTF-8
 VOLUME /var/lib/containers
 
 # RootLESS container storage
-VOLUME /home/developer/.local/share/containers
+# VOLUME /home/developer/.local/share/containers
+RUN mkdir --parents /home/developer/.local/share/containers
+RUN chown developer:developer -R /home/developer/.local/share/containers
 
 # Download latest stable configuration files
 ARG _REPO_URL="https://raw.githubusercontent.com/containers/podman/main/contrib/podmanimage/stable"
 ADD $_REPO_URL/containers.conf /etc/containers/containers.conf
 ADD $_REPO_URL/podman-containers.conf /home/developer/.config/containers/containers.conf
+RUN chown developer:developer -R /home/developer/.config
 
-RUN chown developer:developer -R /home/developer
+#RUN chown developer:developer -R /home/developer
 #RUN sed -i -e 's|^#mount_program|mount_program|g' /etc/containers/storage.conf
 #RUN sed -i -e 's|^#mount_program|mount_program|g' -e '/additionalimage.*/a "/var/lib/shared",' /etc/containers/storage.conf
 
@@ -105,15 +110,6 @@ RUN mkdir --parents \
 #    touch /var/lib/shared/overlay-layers/layers.lock; \ 
 #    touch /var/lib/shared/vfs-images/images.lock;     \
 #    touch /var/lib/shared/vfs-layers/layers.lock
-
-# Add configuration files to tc_agent user
-#RUN mkdir -p /home/tc_agent/.config/containers/
-#ADD $_REPO_URL/podman-containers.conf /home/tc_agent/.config/containers/containers.conf
-#RUN chown -R tc_agent:tc_agent /home/tc_agent/.config/
-
-# NO, assign user externally -- Assign user that runs inside the container
-# USER tc_agent
-# USER podman
 
 # Entry command - starts TeamCity Agent
 CMD ["/run-agent.sh"]
