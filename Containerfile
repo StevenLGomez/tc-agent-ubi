@@ -112,5 +112,6 @@ RUN mkdir --parents \
 #    touch /var/lib/shared/vfs-layers/layers.lock
 
 # Entry command - starts TeamCity Agent
+USER developer
 CMD ["/run-agent.sh"]
 
