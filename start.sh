@@ -1,7 +1,6 @@
 
-# AGENT_IMAGE=quay.io/el_guapo/tc-agent-ubi:001
-# AGENT_IMAGE=piaubi:001
-AGENT_IMAGE=ubi:001
+AGENT_IMAGE=quay.io/el_guapo/tc-agent-ubi:20240118A
+# AGENT_IMAGE=ubi:001
 
 function ShowUsageInformation
 {
@@ -56,7 +55,7 @@ podman run                                                      \
     --user developer                                            \
     --name ${AGENT_NAME}                                        \
     --env AGENT_NAME=${AGENT_NAME}                              \
-    --env SERVER_URL=http://10.1.1.21:8111                      \
+    --env SERVER_URL=http://usstlbas01:8111                     \
     --volume ./config-${AGENT_ID}:/data/teamcity_agent/conf:U   \
     ${AGENT_IMAGE} 
 
