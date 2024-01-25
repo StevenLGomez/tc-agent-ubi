@@ -16,12 +16,6 @@ RUN dnf clean all && rm -rf /var/cache /var/log/dnf* /var/log/yum.*
 
 #               >> TeamCity Agent Configuration begins <<
 
-# Add users, start with UID 2000 to be certain it is beyond all other default users
-#RUN useradd --uid 2000 tc_agent
-#RUN useradd tc_agent; \
-#     echo tc_agent:20000:5000 > /etc/subuid;  \
-#     echo tc_agent:20000:5000 > /etc/subgid;
-
 RUN useradd developer;    \
     echo -e "developer:1:999\ndeveloper:1001:64535" > /etc/subuid;   \
     echo -e "developer:1:999\ndeveloper:1001:64535" > /etc/subgid;
@@ -50,13 +44,13 @@ RUN chmod +x /opt/buildagent/bin/*.sh && \
     echo >> /opt/buildagent/system/.teamcity-agent/unpacked-plugins.xml && \
     sed -i -e 's/\r$//' /opt/buildagent/system/.teamcity-agent/unpacked-plugins.xml
 
-VOLUME /opt/buildagent/work
-VOLUME /opt/buildagent/system
-VOLUME /opt/buildagent/temp
-VOLUME /opt/buildagent/logs
-VOLUME /opt/buildagent/tools
-VOLUME /opt/buildagent/plugins
-VOLUME /data/teamcity_agent/conf
+# VOLUME /opt/buildagent/work
+# VOLUME /opt/buildagent/system
+# VOLUME /opt/buildagent/temp
+# VOLUME /opt/buildagent/logs
+# VOLUME /opt/buildagent/tools
+# VOLUME /opt/buildagent/plugins
+# VOLUME /data/teamcity_agent/conf
 
 # Duplicated from above, the above didn't seem to 'take'
 RUN chown -R developer:developer /data/teamcity_agent 
