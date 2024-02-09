@@ -16,63 +16,48 @@ RUN dnf clean all && rm -rf /var/cache /var/log/dnf* /var/log/yum.*
 
 #               >> TeamCity Agent Configuration begins <<
 
-# Add users, start with UID 2000 to be certain it is beyond all other default users
-#RUN useradd --uid 2000 tc_agent
-RUN useradd tc_agent; \
-     echo tc_agent:20000:5000 > /etc/subuid;  \
-     echo tc_agent:20000:5000 > /etc/subgid;
+# From 'How to Use Podman Inside A Container' Test Image
+RUN useradd developer;    \
+    echo -e "developer:1:999\ndeveloper:1001:64535" > /etc/subuid;   \
+    echo -e "developer:1:999\ndeveloper:1001:64535" > /etc/subgid;
 
-
-# User list for production services
-#RUN useradd --uid 3001 agent01
-#RUN useradd --uid 3002 agent02
-#RUN useradd --uid 3003 agent03
-#RUN useradd --uid 3004 agent04
-#RUN useradd --uid 3005 agent05
-#RUN useradd --uid 3006 agent06
-#RUN useradd --uid 3007 agent07
-#RUN useradd --uid 3008 agent08
-#RUN useradd --uid 3009 agent09
-#RUN useradd --uid 3010 agent10
-
-# Users for prototyping
-#RUN useradd --uid 4001 agentA
-#RUN useradd --uid 4002 agentB
-#RUN useradd --uid 4003 agentC
+RUN groupadd containers && usermod --append --groups containers developer
 
 # Configure TeamCity configuration file
 ENV CONFIG_FILE=/data/teamcity_agent/conf/buildAgent.properties 
 RUN mkdir -p /data/teamcity_agent/conf && \
-    chown -R tc_agent:tc_agent /data/teamcity_agent 
+    chown -R developer:developer /data/teamcity_agent 
 
 # Copy & configure TeamCity startup script (runs at Container start time)
-COPY --chown=tc_agent:tc_agent TeamCity/run-agent.sh /run-agent.sh
+COPY --chown=developer:developer TeamCity/run-agent.sh /run-agent.sh
 RUN chmod +x /run-agent.sh && sync && sed -i -e 's/\r$//' /run-agent.sh
 
 # Setup TeamCity Agent & directory structure 
-COPY --chown=tc_agent:tc_agent TeamCity/buildAgentFull /opt/buildagent
+COPY --chown=developer:developer TeamCity/buildAgentFull /opt/buildagent
 RUN chmod +x /opt/buildagent/bin/*.sh && \
     mkdir -p /opt/buildagent/work && \
     mkdir -p /opt/buildagent/system/.teamcity-agent && \
     mkdir -p /opt/buildagent/temp && \
     mkdir -p /opt/buildagent/logs && \
     mkdir -p /opt/buildagent/tools && \
-    chown -R tc_agent:tc_agent /opt/buildagent && \
-    chown -R tc_agent:tc_agent /opt/buildagent/work/ && \
+    chown -R developer:developer /opt/buildagent && \
+    chown -R developer:containers /opt/buildagent/work/ && \
     echo >> /opt/buildagent/system/.teamcity-agent/teamcity-agent.xml && \
     sed -i -e 's/\r$//' /opt/buildagent/system/.teamcity-agent/teamcity-agent.xml && \
     echo >> /opt/buildagent/system/.teamcity-agent/unpacked-plugins.xml && \
     sed -i -e 's/\r$//' /opt/buildagent/system/.teamcity-agent/unpacked-plugins.xml
 
-VOLUME /opt/buildagent/work
-VOLUME /opt/buildagent/system
-VOLUME /opt/buildagent/temp
-VOLUME /opt/buildagent/logs
-VOLUME /opt/buildagent/tools
-VOLUME /opt/buildagent/plugins
-VOLUME /data/teamcity_agent/conf
+# VOLUME /opt/buildagent/work
+# VOLUME /opt/buildagent/system
+# VOLUME /opt/buildagent/temp
+# VOLUME /opt/buildagent/logs
+# VOLUME /opt/buildagent/tools
+# VOLUME /opt/buildagent/plugins
+# VOLUME /data/teamcity_agent/conf
 
-#
+# Duplicated from above, the above didn't seem to 'take'
+RUN chown -R developer:developer /data/teamcity_agent 
+
 ENV JAVA_HOME=/usr
 ENV LANG=C.UTF-8
 
@@ -80,22 +65,25 @@ ENV LANG=C.UTF-8
 
 #          >> Podman Container in Container Configuration begins <<
 
-RUN useradd podman; \
-     echo podman:10000:5000 > /etc/subuid;  \
-     echo podman:10000:5000 > /etc/subgid;
+#RUN useradd podman; \
+#     echo podman:10000:5000 > /etc/subuid;  \
+#     echo podman:10000:5000 > /etc/subgid;
 
 # RootFULL container storage
 VOLUME /var/lib/containers
 
 # RootLESS container storage
-VOLUME /home/podman/.local/share/containers
+# VOLUME /home/developer/.local/share/containers
+RUN mkdir --parents /home/developer/.local/share/containers
+RUN chown developer:developer -R /home/developer/.local/share/containers
 
 # Download latest stable configuration files
 ARG _REPO_URL="https://raw.githubusercontent.com/containers/podman/main/contrib/podmanimage/stable"
 ADD $_REPO_URL/containers.conf /etc/containers/containers.conf
-ADD $_REPO_URL/podman-containers.conf /home/podman/.config/containers/containers.conf
+ADD $_REPO_URL/podman-containers.conf /home/developer/.config/containers/containers.conf
+RUN chown developer:developer -R /home/developer/.config
 
-RUN chown podman:podman -R /home/podman
+#RUN chown developer:developer -R /home/developer
 #RUN sed -i -e 's|^#mount_program|mount_program|g' /etc/containers/storage.conf
 #RUN sed -i -e 's|^#mount_program|mount_program|g' -e '/additionalimage.*/a "/var/lib/shared",' /etc/containers/storage.conf
 
@@ -120,15 +108,7 @@ RUN mkdir --parents \
 #    touch /var/lib/shared/vfs-images/images.lock;     \
 #    touch /var/lib/shared/vfs-layers/layers.lock
 
-# Add configuration files to tc_agent user
-#RUN mkdir -p /home/tc_agent/.config/containers/
-#ADD $_REPO_URL/podman-containers.conf /home/tc_agent/.config/containers/containers.conf
-#RUN chown -R tc_agent:tc_agent /home/tc_agent/.config/
-
-# NO, assign user externally -- Assign user that runs inside the container
-# USER tc_agent
-# USER podman
-
 # Entry command - starts TeamCity Agent
-# CMD ["/run-agent.sh"]
+USER developer
+CMD ["/run-agent.sh"]
 
