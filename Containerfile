@@ -1,6 +1,4 @@
 
-# Container in Container base example
-
 FROM registry.access.redhat.com/ubi9/ubi
 
 # Update & install items required to run as a TeamCity Agent
@@ -33,6 +31,11 @@ COPY --chown=developer:developer TeamCity/run-agent.sh /run-agent.sh
 RUN chmod +x /run-agent.sh && sync && sed -i -e 's/\r$//' /run-agent.sh
 
 # Setup TeamCity Agent & directory structure 
+
+# Copy prebuilt configuration files into the container. (web URLs above went stale) - THINK THESE COPYs ARE DUPLICATED BELOW SO REMOVE THESE??
+COPY ./containers.conf /etc/containers/containers.conf
+COPY ./podman-containers.conf /home/developer/.config/containers/containers.conf
+
 COPY --chown=developer:developer TeamCity/buildAgentFull /opt/buildagent
 RUN chmod +x /opt/buildagent/bin/*.sh && \
     mkdir -p /opt/buildagent/work && \
@@ -47,6 +50,9 @@ RUN chmod +x /opt/buildagent/bin/*.sh && \
     echo >> /opt/buildagent/system/.teamcity-agent/unpacked-plugins.xml && \
     sed -i -e 's/\r$//' /opt/buildagent/system/.teamcity-agent/unpacked-plugins.xml
 
+# These VOLUMES were commented because, as is, they required rootful VOLUMES.
+# Behavior doesn't seem to be impacted, but worth investigating support of 
+# both types of volumes...
 # VOLUME /opt/buildagent/work
 # VOLUME /opt/buildagent/system
 # VOLUME /opt/buildagent/temp
@@ -78,9 +84,14 @@ RUN mkdir --parents /home/developer/.local/share/containers
 RUN chown developer:developer -R /home/developer/.local/share/containers
 
 # Download latest stable configuration files
-ARG _REPO_URL="https://raw.githubusercontent.com/containers/podman/main/contrib/podmanimage/stable"
-ADD $_REPO_URL/containers.conf /etc/containers/containers.conf
-ADD $_REPO_URL/podman-containers.conf /home/developer/.config/containers/containers.conf
+# ARG _REPO_URL="https://raw.githubusercontent.com/containers/podman/main/contrib/podmanimage/stable"
+# ADD $_REPO_URL/containers.conf /etc/containers/containers.conf
+# ADD $_REPO_URL/podman-containers.conf /home/developer/.config/containers/containers.conf
+
+# Copy prebuilt configuration files into the container. (web URLs above went stale)
+COPY ./containers.conf /etc/containers/containers.conf
+COPY ./podman-containers.conf /home/developer/.config/containers/containers.conf
+
 RUN chown developer:developer -R /home/developer/.config
 
 #RUN chown developer:developer -R /home/developer
